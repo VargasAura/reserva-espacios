@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: cabecera('Mi perfil')}"></head>
+<body>
+<nav th:replace="~{fragments/base :: navbar}"></nav>
+<link rel="stylesheet" th:href="@{/css/reservas.css}">
+<main class="contenedor">
+
+    <h1>Mi perfil</h1>
+
+    <div class="aviso ok" th:if="${exito}" th:text="${exito}"></div>
+
+    <!-- Un solo formulario con dos tarjetas: datos y contraseña (REQ-8, REQ-9) -->
+    <form th:object="${perfilForm}" th:action="@{/perfil}" method="post" novalidate>
+
+        <!-- Errores de regla, por ejemplo contraseña actual incorrecta (REQ-9) -->
+        <div class="aviso error" th:if="${#fields.hasGlobalErrors()}">
+            <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error</div>
+        </div>
+
+        <div class="perfil-rejilla">
+            <div class="tarjeta acento">
+                <h2>Mis datos</h2>
+
+                <label>Correo electrónico</label>
+                <div class="perfil-correo" th:text="${email}">correo@uis.edu.co</div>
+                <p class="nota">El correo no se puede cambiar.</p>
+
+                <label for="nombre">Nombre</label>
+                <input id="nombre" type="text" th:field="*{nombre}">
+                <div class="error-campo" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+
+                <label for="telefono">Teléfono</label>
+                <input id="telefono" type="tel" th:field="*{telefono}">
+                <div class="error-campo" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
+            </div>
+
+            <div class="tarjeta acento tierra">
+                <h2>Cambiar contraseña</h2>
+                <p class="nota">Déjalo en blanco si no quieres cambiarla.</p>
+
+                <label for="passwordActual">Contraseña actual</label>
+                <input id="passwordActual" type="password" th:field="*{passwordActual}" autocomplete="current-password">
+
+                <label for="passwordNueva">Contraseña nueva</label>
+                <input id="passwordNueva" type="password" th:field="*{passwordNueva}" autocomplete="new-password">
+                <div class="error-campo" th:if="${#fields.hasErrors('passwordNueva')}" th:errors="*{passwordNueva}"></div>
+                <p class="nota">Mínimo 8 caracteres, con al menos una letra y un número.</p>
+
+                <label for="passwordConfirmacion">Confirmar contraseña nueva</label>
+                <input id="passwordConfirmacion" type="password" th:field="*{passwordConfirmacion}" autocomplete="new-password">
+            </div>
+        </div>
+
+        <div class="perfil-guardar">
+            <button class="btn" type="submit">Guardar cambios</button>
+        </div>
+    </form>
+
+    <!-- Historial de reservas (REQ-8) -->
+    <div class="tarjeta acento" style="margin-top:1.5rem">
+        <h2>Historial de reservas</h2>
+
+        <p th:if="${#lists.isEmpty(historial)}">Aún no tienes reservas. Cuando hagas una, aparecerá aquí.</p>
+
+        <div class="tabla-scroll" th:unless="${#lists.isEmpty(historial)}">
+            <table>
+                <thead>
+                <tr><th>Espacio</th><th>Fecha</th><th>Horario</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="h : ${historial}">
+                    <td th:text="${h.espacio}">Espacio</td>
+                    <td th:text="${h.fecha}">01/01/2026</td>
+                    <td th:text="${h.horario}">10:00 – 11:00</td>
+                    <td><span class="estado" th:classappend="${h.estado}" th:text="${h.estadoTexto}">RESERVADA</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+<div class="pie">Sistema de Reserva de Espacios Compartidos · UIS</div>
+</body>
+</html>

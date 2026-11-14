@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: cabecera('Calendario')}"></head>
+<body>
+<nav th:replace="~{fragments/base :: navbar}"></nav>
+<link rel="stylesheet" th:href="@{/css/calendario.css}">
+<main class="contenedor" id="app-calendario"
+      th:attr="data-url-datos=@{/calendario/datos},data-url-reserva=@{/reservas/nueva}">
+
+    <div class="tarjeta acento">
+        <h1>Calendario de disponibilidad</h1>
+
+        <!-- Filtros combinados (REQ-10, REQ-11) -->
+        <div class="cal-filtros">
+            <div>
+                <label>Vista</label>
+                <div class="segmentado" id="vistas">
+                    <button type="button" th:each="v : ${vistas}" th:data-vista="${v.name()}"
+                            th:text="${v.name() == 'DIA' ? 'Día' : (v.name() == 'SEMANA' ? 'Semana' : 'Mes')}"
+                            th:classappend="${v.name() == 'DIA'} ? 'activo'">Día</button>
+                </div>
+            </div>
+            <div>
+                <label for="fecha">Fecha</label>
+                <div class="nav-fecha">
+                    <button type="button" class="btn borde chico" id="btn-anterior" aria-label="Anterior">◀</button>
+                    <input type="date" id="fecha">
+                    <button type="button" class="btn borde chico" id="btn-siguiente" aria-label="Siguiente">▶</button>
+                    <button type="button" class="btn borde chico" id="btn-hoy">Hoy</button>
+                </div>
+            </div>
+            <div>
+                <label for="tipo">Tipo de espacio</label>
+                <select id="tipo">
+                    <option value="">Todos</option>
+                    <option th:each="t : ${tipos}" th:value="${t.name()}" th:text="${t.etiqueta}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="franja">Franja horaria</label>
+                <select id="franja">
+                    <option th:each="f : ${franjas}" th:value="${f.name()}" th:text="${f.etiqueta}"
+                            th:selected="${f.name() == 'DIA_COMPLETO'}"></option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Leyenda (REQ-10) -->
+        <div class="leyenda">
+            <span><i class="muestra libre"></i> Disponible</span>
+            <span><i class="muestra reservado"></i> Reservado</span>
+            <span><i class="muestra bloqueado"></i> Bloqueado (horario pasado)</span>
+        </div>
+    </div>
+
+    <div class="tarjeta" style="margin-top:1.2rem">
+        <h2 id="periodo">Cargando…</h2>
+
+        <div class="aviso error" id="error-conexion" hidden>
+            No se pudo actualizar el calendario. Reintentando automáticamente…
+        </div>
+
+        <!-- Sin disponibilidad (REQ-13) -->
+        <div class="aviso error" id="sin-disponibilidad" hidden>
+            <strong>No hay disponibilidad para los filtros elegidos.</strong><br>
+            Prueba ampliarlos: elige otra fecha, otra franja horaria, otro tipo de espacio o la vista semanal o mensual.
+        </div>
+
+        <div class="cal-contenedor" id="calendario" aria-live="polite">
+            <p class="nota">Cargando calendario…</p>
+        </div>
+    </div>
+
+    <!-- Detalle del espacio (REQ-12) -->
+    <div class="tarjeta acento tierra" style="margin-top:1.2rem" id="detalle">
+        <h2>Detalle del espacio</h2>
+        <div id="detalle-contenido"></div>
+    </div>
+
+</main>
+<div class="pie">Sistema de Reserva de Espacios Compartidos · UIS</div>
+<script th:src="@{/js/calendario.js}" defer></script>
+</body>
+</html>

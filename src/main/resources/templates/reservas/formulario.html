@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: cabecera('Reserva')}"></head>
+<body>
+<nav th:replace="~{fragments/base :: navbar}"></nav>
+<link rel="stylesheet" th:href="@{/css/reservas.css}">
+<main class="contenedor">
+    <div class="tarjeta acento form-reserva">
+
+        <h1 th:text="${reservaForm.id != null} ? 'Editar reserva' : 'Nueva reserva'">Nueva reserva</h1>
+
+        <form th:object="${reservaForm}"
+              th:action="${reservaForm.id != null} ? @{/reservas/{id}(id=${reservaForm.id})} : @{/reservas}"
+              method="post" novalidate>
+
+            <!-- Error de regla o conflicto de horario (REQ-16, REQ-21) -->
+            <div class="aviso error destacado" th:if="${#fields.hasGlobalErrors()}">
+                <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error</div>
+            </div>
+
+            <!-- Espacio (REQ-15). Al editar no se puede cambiar: se muestra bloqueado y se envía oculto. -->
+            <label for="espacioId">Espacio</label>
+            <th:block th:if="${reservaForm.id == null}">
+                <select id="espacioId" th:field="*{espacioId}">
+                    <option value="">Selecciona un espacio…</option>
+                    <option th:each="e : ${espacios}" th:value="${e.id}"
+                            th:text="${e.nombre} + ' · ' + ${e.tipo.etiqueta} + ' (' + ${e.capacidad} + ' personas)'"></option>
+                </select>
+                <div class="error-campo" th:if="${#fields.hasErrors('espacioId')}" th:errors="*{espacioId}"></div>
+            </th:block>
+            <th:block th:unless="${reservaForm.id == null}">
+                <select id="espacioVista" disabled>
+                    <option th:each="e : ${espacios}" th:value="${e.id}" th:text="${e.nombre}"
+                            th:selected="${e.id == reservaForm.espacioId}"></option>
+                </select>
+                <input type="hidden" th:field="*{espacioId}">
+                <p class="nota">El espacio no se puede cambiar al editar. Si necesitas otro, cancela esta reserva y crea una nueva.</p>
+            </th:block>
+
+            <label for="fecha">Fecha</label>
+            <input id="fecha" type="date" th:field="*{fecha}"
+                   th:min="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
+            <div class="error-campo" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></div>
+
+            <div class="fila-horas">
+                <div>
+                    <label for="horaInicio">Hora de inicio</label>
+                    <input id="horaInicio" type="time" th:field="*{horaInicio}">
+                    <div class="error-campo" th:if="${#fields.hasErrors('horaInicio')}" th:errors="*{horaInicio}"></div>
+                </div>
+                <div>
+                    <label for="horaFin">Hora de fin</label>
+                    <input id="horaFin" type="time" th:field="*{horaFin}">
+                    <div class="error-campo" th:if="${#fields.hasErrors('horaFin')}" th:errors="*{horaFin}"></div>
+                </div>
+            </div>
+
+            <div class="botones-form">
+                <button class="btn" type="submit"
+                        th:text="${reservaForm.id != null} ? 'Guardar cambios' : 'Reservar'">Reservar</button>
+                <a class="btn borde" th:href="@{/reservas}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+<div class="pie">Sistema de Reserva de Espacios Compartidos · UIS</div>
+</body>
+</html>

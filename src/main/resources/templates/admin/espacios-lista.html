@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: cabecera('Espacios')}"></head>
+<body>
+<nav th:replace="~{fragments/base :: navbar}"></nav>
+<style>
+    .encabezado { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+    .encabezado h1 { margin: 0; }
+    .dato { margin: .2rem 0; color: var(--cafe-suave); }
+    .dato strong { color: var(--cafe); }
+    .acciones-espacio { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+    .acciones-espacio form { margin: 0; }
+    .btn.chico { padding: .35rem .9rem; font-size: .9rem; }
+</style>
+<main class="contenedor">
+
+    <div class="encabezado">
+        <h1>Espacios</h1>
+        <a class="btn" th:href="@{/admin/espacios/nuevo}">➕ Nuevo espacio</a>
+    </div>
+
+    <div class="aviso ok" th:if="${exito}" th:text="${exito}"></div>
+    <div class="aviso error" th:if="${error}" th:text="${error}"></div>
+
+    <!-- Sin espacios -->
+    <div class="tarjeta" th:if="${#lists.isEmpty(espacios)}" style="margin-top:1.2rem">
+        <p>Aún no hay espacios registrados. Crea el primero con el botón «Nuevo espacio».</p>
+    </div>
+
+    <!-- Lista (REQ-40, REQ-42, REQ-43) -->
+    <div class="rejilla" th:unless="${#lists.isEmpty(espacios)}" style="margin-top:1.2rem">
+        <div class="tarjeta acento" th:each="e : ${espacios}">
+            <h3 th:text="${e.nombre}">Nombre</h3>
+            <p class="dato">🏷️ Tipo: <strong th:text="${e.tipo.etiqueta}">Tipo</strong></p>
+            <p class="dato">👥 Capacidad: <strong th:text="${e.capacidad} + ' personas'">10 personas</strong></p>
+            <p class="dato">📍 Ubicación: <strong th:text="${e.ubicacion}">Ubicación</strong></p>
+
+            <div class="acciones-espacio">
+                <a class="btn borde chico" th:href="@{/admin/espacios/{id}/editar(id=${e.id})}">Editar</a>
+                <form th:action="@{/admin/espacios/{id}/eliminar(id=${e.id})}" method="post"
+                      onsubmit="return confirm('¿Eliminar este espacio? Dejará de estar disponible para nuevas reservas, pero su historial de reservas se conservará para consultas y reportes.')">
+                    <button class="btn tierra chico" type="submit">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</main>
+<div class="pie">Sistema de Reserva de Espacios Compartidos · UIS</div>
+</body>
+</html>

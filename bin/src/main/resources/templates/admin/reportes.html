@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: cabecera('Reportes')}"></head>
+<body>
+<nav th:replace="~{fragments/base :: navbar}"></nav>
+<link rel="stylesheet" th:href="@{/css/reportes.css}">
+<main class="contenedor">
+
+    <!-- Filtros (REQ-51) -->
+    <div class="tarjeta acento">
+        <h1>Reportes de uso</h1>
+
+        <div class="aviso error" th:if="${error}" th:text="${error}"></div>
+
+        <form th:action="@{/admin/reportes}" method="get" class="filtros-reporte">
+            <div>
+                <label for="desde">Desde</label>
+                <input id="desde" name="desde" type="date" th:value="${desde}">
+            </div>
+            <div>
+                <label for="hasta">Hasta</label>
+                <input id="hasta" name="hasta" type="date" th:value="${hasta}">
+            </div>
+            <div>
+                <label for="espacioId">Espacio</label>
+                <select id="espacioId" name="espacioId">
+                    <option value="">Todos</option>
+                    <option th:each="e : ${espacios}" th:value="${e.id}"
+                            th:text="${e.nombre} + (${e.activo} ? '' : ' (eliminado)')"
+                            th:selected="${e.id == espacioId}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="tipo">Tipo de espacio</label>
+                <select id="tipo" name="tipo">
+                    <option value="">Todos</option>
+                    <option th:each="t : ${tipos}" th:value="${t.name()}" th:text="${t.etiqueta}"
+                            th:selected="${t == tipo}"></option>
+                </select>
+            </div>
+            <div class="acciones-filtro">
+                <button class="btn" type="submit">Generar reporte</button>
+                <a class="btn borde" th:href="@{/admin/reportes}">Mes actual</a>
+            </div>
+        </form>
+    </div>
+
+    <th:block th:if="${reporte != null}">
+
+        <!-- Sin datos (REQ-55) -->
+        <div class="tarjeta vacio" th:unless="${reporte.hayDatos()}" style="margin-top:1.2rem">
+            <div class="emoji">🌱</div>
+            <h2>Sin datos para mostrar</h2>
+            <p>No hay reservas en el periodo y con los filtros seleccionados. Prueba con otro rango de fechas, espacio o tipo.</p>
+        </div>
+
+        <th:block th:if="${reporte.hayDatos()}">
+
+            <!-- Tarjetas con totales (REQ-52) -->
+            <div class="rejilla totales">
+                <div class="tarjeta acento">
+                    <p class="total-valor" th:text="${reporte.totalReservas}">0</p>
+                    <p class="total-texto">Reservas en el periodo</p>
+                </div>
+                <div class="tarjeta acento tierra">
+                    <p class="total-valor" th:text="${reporte.horasReservadas} + ' h'">0 h</p>
+                    <p class="total-texto">Horas reservadas</p>
+                </div>
+                <div class="tarjeta acento">
+                    <p class="total-valor" th:text="${reporte.ocupacionGlobal} + ' %'">0 %</p>
+                    <p class="total-texto">Ocupación global</p>
+                </div>
+            </div>
+
+            <!-- Gráficos hechos con HTML/CSS (REQ-54) -->
+            <div class="graficos">
+                <div class="tarjeta">
+                    <h2>Reservas por estado</h2>
+                    <div class="barra-fila" th:each="b : ${reporte.estados}">
+                        <span class="barra-etiqueta" th:text="${b.etiqueta}">Finalizadas</span>
+                        <div class="barra-pista">
+                            <div th:class="'barra-relleno ' + ${b.clase}"
+                                 th:style="'width:' + ${b.porcentaje} + '%'"></div>
+                        </div>
+                        <span class="barra-valor" th:text="${b.cantidad} + ' (' + ${b.porcentaje} + '%)'">0</span>
+                    </div>
+                </div>
+
+                <div class="tarjeta">
+                    <h2>Ocupación por espacio</h2>
+                    <div class="barra-fila" th:each="f : ${reporte.filas}">
+                        <span class="barra-etiqueta" th:text="${f.nombre}" th:title="${f.nombre}">Espacio</span>
+                        <div class="barra-pista">
+                            <div class="barra-relleno ocupacion" th:style="'width:' + ${f.barra()} + '%'"></div>
+                        </div>
+                        <span class="barra-valor" th:text="${f.ocupacion} + ' %'">0 %</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla por espacio (REQ-52, REQ-54) -->
+            <div class="tarjeta" style="margin-top:1.2rem">
+                <h2>Detalle por espacio</h2>
+                <div class="tabla-scroll">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Espacio</th><th>Tipo</th>
+                            <th class="num">Reservas</th><th class="num">Horas reservadas</th><th class="num">Ocupación</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="f : ${reporte.filas}">
+                            <td>
+                                <span th:text="${f.nombre}">Espacio</span>
+                                <span class="etiqueta-eliminado" th:if="${f.eliminado}">(eliminado)</span>
+                            </td>
+                            <td th:text="${f.tipo}">Tipo</td>
+                            <td class="num" th:text="${f.totalReservas}">0</td>
+                            <td class="num" th:text="${f.horasReservadas} + ' h'">0 h</td>
+                            <td class="num" th:text="${f.ocupacion} + ' %'">0 %</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="total-texto" style="margin-top:1rem; font-size:.9rem">
+                    Ocupación = horas reservadas ÷ (días del periodo × 16 h, de 06:00 a 22:00).
+                    Cuentan como horas reservadas las reservas finalizadas, confirmadas o en uso.
+                </p>
+            </div>
+        </th:block>
+    </th:block>
+
+</main>
+<div class="pie">Sistema de Reserva de Espacios Compartidos · UIS</div>
+</body>
+</html>

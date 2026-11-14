@@ -1,0 +1,102 @@
+/* ===== Paleta verdes + tierra (todo el sistema usa estas variables) ===== */
+:root {
+  --verde-bosque: #2f5d3a;
+  --verde-salvia: #7a9a7e;
+  --verde-oliva:  #6b7a3a;
+  --verde-menta:  #e3ece0;
+  --arena:        #f5efe3;
+  --crema:        #fbf8f1;
+  --terracota:    #c06a45;
+  --terracota-osc:#9c522f;
+  --cafe:         #4a3b2c;
+  --cafe-suave:   #7b6a58;
+  --borde:        #d9cfbc;
+  --error:        #a63d2f;
+  --ok:           #3d7a4a;
+
+  /* colores de los estados de la reserva */
+  --est-reservada:  #c9a24b;
+  --est-confirmada: #3d7a4a;
+  --est-en-uso:     #2f6f8a;
+  --est-finalizada: #7b6a58;
+  --est-cancelada:  #a63d2f;
+  --est-noshow:     #8a5a7a;
+
+  --radio: 14px;
+  --sombra: 0 6px 20px rgba(74, 59, 44, .10);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: "Segoe UI", system-ui, sans-serif; color: var(--cafe);
+  background: var(--arena); line-height: 1.5;
+}
+a { color: var(--verde-bosque); }
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: var(--verde-bosque); margin-top: 0; }
+
+/* ----- Barra superior ----- */
+.navbar {
+  background: var(--verde-bosque); color: var(--crema); display: flex; flex-wrap: wrap;
+  align-items: center; gap: 1rem; padding: .8rem 1.5rem;
+}
+.navbar .marca { font-family: Georgia, serif; font-size: 1.25rem; font-weight: bold; margin-right: auto; }
+.navbar a { color: var(--crema); text-decoration: none; padding: .35rem .7rem; border-radius: 999px; }
+.navbar a:hover { background: rgba(255,255,255,.15); }
+.navbar form { margin: 0; }
+.navbar .btn-salir { background: transparent; border: 1px solid var(--crema); color: var(--crema);
+  padding: .35rem .9rem; border-radius: 999px; cursor: pointer; }
+.navbar .btn-salir:hover { background: var(--terracota); border-color: var(--terracota); }
+
+/* ----- Contenedores ----- */
+.contenedor { max-width: 1100px; margin: 2rem auto; padding: 0 1.2rem; }
+.tarjeta {
+  background: var(--crema); border: 1px solid var(--borde); border-radius: var(--radio);
+  box-shadow: var(--sombra); padding: 1.6rem;
+}
+.rejilla { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.tarjeta.acento { border-top: 5px solid var(--verde-salvia); }
+.tarjeta.acento.tierra { border-top-color: var(--terracota); }
+
+/* ----- Formularios ----- */
+.formulario { max-width: 440px; margin: 3rem auto; }
+label { display: block; font-weight: 600; margin: .9rem 0 .25rem; }
+input[type=text], input[type=email], input[type=password], input[type=tel],
+input[type=number], input[type=date], input[type=time], input[type=datetime-local], select, textarea {
+  width: 100%; padding: .65rem .8rem; border: 1px solid var(--borde); border-radius: 10px;
+  background: #fff; color: var(--cafe); font-size: 1rem;
+}
+input:focus, select:focus, textarea:focus { outline: 3px solid var(--verde-menta); border-color: var(--verde-salvia); }
+.check { display: flex; gap: .5rem; align-items: flex-start; font-weight: normal; }
+.check input { margin-top: .3rem; }
+
+.btn {
+  display: inline-block; border: none; cursor: pointer; font-size: 1rem; text-decoration: none;
+  padding: .7rem 1.4rem; border-radius: 999px; background: var(--verde-bosque); color: var(--crema);
+}
+.btn:hover { background: var(--verde-oliva); }
+.btn.tierra { background: var(--terracota); }
+.btn.tierra:hover { background: var(--terracota-osc); }
+.btn.borde { background: transparent; color: var(--verde-bosque); border: 1px solid var(--verde-bosque); }
+.btn.ancho { width: 100%; margin-top: 1.2rem; }
+
+/* ----- Mensajes ----- */
+.aviso { padding: .7rem 1rem; border-radius: 10px; margin: 1rem 0; border: 1px solid; }
+.aviso.ok    { background: var(--verde-menta); border-color: var(--verde-salvia); color: var(--ok); }
+.aviso.error { background: #f6e3de; border-color: var(--error); color: var(--error); }
+.error-campo { color: var(--error); font-size: .88rem; margin-top: .2rem; }
+
+/* ----- Tablas y etiquetas de estado ----- */
+table { width: 100%; border-collapse: collapse; background: var(--crema); border-radius: var(--radio); overflow: hidden; }
+th { background: var(--verde-menta); color: var(--verde-bosque); text-align: left; }
+th, td { padding: .7rem .9rem; border-bottom: 1px solid var(--borde); }
+.tabla-scroll { overflow-x: auto; }
+.estado { display: inline-block; padding: .15rem .7rem; border-radius: 999px; color: #fff; font-size: .85rem; }
+.estado.RESERVADA  { background: var(--est-reservada); }
+.estado.CONFIRMADA { background: var(--est-confirmada); }
+.estado.EN_USO     { background: var(--est-en-uso); }
+.estado.FINALIZADA { background: var(--est-finalizada); }
+.estado.CANCELADA  { background: var(--est-cancelada); }
+.estado.NO_SHOW    { background: var(--est-noshow); }
+
+.pie { text-align: center; color: var(--cafe-suave); padding: 2rem 0; font-size: .9rem; }
+@media (max-width: 600px) { .navbar { padding: .6rem 1rem; } .contenedor { margin: 1rem auto; } }

@@ -1,0 +1,33 @@
+/* Estilos de reportes (REQ-54). Solo usa las variables de tema.css. */
+.filtros-reporte { display: flex; flex-wrap: wrap; gap: .8rem; align-items: flex-end; }
+.filtros-reporte > div { flex: 1 1 170px; }
+.filtros-reporte label { margin-top: 0; }
+.filtros-reporte .acciones-filtro { flex: 0 0 auto; display: flex; flex-wrap: wrap; gap: .5rem; }
+
+.totales { margin-top: 1.2rem; }
+.total-valor { font-family: Georgia, "Times New Roman", serif; font-size: 2rem; color: var(--verde-bosque); margin: 0; }
+.total-texto { color: var(--cafe-suave); margin: 0; }
+
+.graficos { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); margin-top: 1.2rem; }
+
+/* Barras horizontales hechas solo con <div> */
+.barra-fila { display: grid; grid-template-columns: 9rem 1fr 6.5rem; gap: .6rem; align-items: center; margin: .7rem 0; }
+.barra-etiqueta { font-size: .95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barra-valor { font-size: .9rem; color: var(--cafe-suave); text-align: right; }
+.barra-pista { background: var(--verde-menta); border-radius: 999px; height: 1.1rem; overflow: hidden; }
+.barra-relleno { height: 100%; border-radius: 999px; background: var(--verde-salvia); }
+.barra-relleno.ocupacion { background: var(--verde-oliva); }
+.barra-relleno.FINALIZADA { background: var(--est-finalizada); }
+.barra-relleno.CANCELADA  { background: var(--est-cancelada); }
+.barra-relleno.NO_SHOW    { background: var(--est-noshow); }
+
+.etiqueta-eliminado { color: var(--terracota-osc); font-size: .85rem; font-weight: 600; }
+.vacio { text-align: center; padding: 2rem 1rem; color: var(--cafe-suave); }
+.vacio .emoji { font-size: 2.5rem; }
+.num { text-align: right; white-space: nowrap; }
+
+@media (max-width: 600px) {
+    .barra-fila { grid-template-columns: 1fr auto; }
+    .barra-fila .barra-pista { grid-column: 1 / -1; grid-row: 2; }
+    .graficos { grid-template-columns: 1fr; }
+}
