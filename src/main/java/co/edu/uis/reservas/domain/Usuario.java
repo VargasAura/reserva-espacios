@@ -31,7 +31,11 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CanalNotificacion canalNotificacion = CanalNotificacion.CORREO;
+    private CanalNotificacion canalNotificacion = CanalNotificacion.SMS;
+
+    /** false = la persona no quiere recibir notificaciones (ni SMS ni correo de avisos). */
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean notificacionesActivas = true;
 
     public Usuario() {}
 
@@ -50,4 +54,6 @@ public class Usuario {
     public void setActivo(boolean activo) { this.activo = activo; }
     public CanalNotificacion getCanalNotificacion() { return canalNotificacion; }
     public void setCanalNotificacion(CanalNotificacion c) { this.canalNotificacion = c; }
+    public boolean isNotificacionesActivas() { return notificacionesActivas; }
+    public void setNotificacionesActivas(boolean notificacionesActivas) { this.notificacionesActivas = notificacionesActivas; }
 }

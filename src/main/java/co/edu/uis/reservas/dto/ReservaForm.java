@@ -41,7 +41,10 @@ public class ReservaForm {
     }
 
     public LocalDateTime calcularInicio() { return LocalDateTime.of(fecha, horaInicio); }
-    public LocalDateTime calcularFin() { return LocalDateTime.of(fecha, horaFin); }
+    /** La hora de fin 00:00 significa la medianoche al terminar ese día (24:00), no el inicio del mismo día. */
+    public LocalDateTime calcularFin() {
+        return LocalTime.MIDNIGHT.equals(horaFin) ? fecha.plusDays(1).atStartOfDay() : LocalDateTime.of(fecha, horaFin);
+    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

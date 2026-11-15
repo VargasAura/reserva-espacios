@@ -16,6 +16,11 @@ public class PerfilForm {
     @Pattern(regexp = "^[0-9+\\s-]{7,15}$", message = "El teléfono no es válido")
     private String telefono;
 
+    /** Cómo quiere recibir los avisos: SMS, CORREO o NINGUNA. */
+    @NotBlank(message = "Elige cómo quieres recibir las notificaciones")
+    @Pattern(regexp = "^(SMS|CORREO|NINGUNA)$", message = "Opción de notificaciones no válida")
+    private String notificaciones;
+
     private String passwordActual;
 
     @Pattern(regexp = PATRON_PASSWORD, message = "Mínimo 8 caracteres, con al menos una letra y un número")
@@ -27,6 +32,8 @@ public class PerfilForm {
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getNotificaciones() { return notificaciones; }
+    public void setNotificaciones(String notificaciones) { this.notificaciones = notificaciones; }
     public String getPasswordActual() { return passwordActual; }
     public void setPasswordActual(String passwordActual) { this.passwordActual = passwordActual; }
     public String getPasswordNueva() { return passwordNueva; }

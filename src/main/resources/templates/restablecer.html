@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: cabecera('Nueva contraseña')}"></head>
+<body>
+<main class="formulario tarjeta acento tierra">
+  <h1>Nueva contraseña</h1>
+
+  <th:block th:if="${tokenValido}">
+    <form th:action="@{/restablecer}" th:object="${restablecerForm}" method="post" novalidate>
+      <input type="hidden" th:field="*{token}">
+
+      <label for="password">Contraseña nueva</label>
+      <input id="password" type="password" th:field="*{password}" autocomplete="new-password" autofocus>
+      <div class="error-campo" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+      <p class="nota">Mínimo 8 caracteres, con al menos una letra y un número.</p>
+
+      <label for="confirmacion">Confirmar contraseña nueva</label>
+      <input id="confirmacion" type="password" th:field="*{confirmacion}" autocomplete="new-password">
+      <div class="error-campo" th:if="${#fields.hasErrors('confirmacion')}" th:errors="*{confirmacion}"></div>
+
+      <button class="btn tierra ancho" type="submit">Guardar contraseña</button>
+    </form>
+  </th:block>
+
+  <th:block th:unless="${tokenValido}">
+    <div class="aviso error">El enlace no es válido o ya venció. Solicita uno nuevo.</div>
+    <a class="btn ancho" th:href="@{/olvide-contrasena}">Solicitar un enlace nuevo</a>
+  </th:block>
+</main>
+</body>
+</html>

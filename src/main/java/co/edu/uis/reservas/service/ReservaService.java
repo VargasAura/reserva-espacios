@@ -1,5 +1,6 @@
 package co.edu.uis.reservas.service;
 
+import co.edu.uis.reservas.config.HorasReserva;
 import co.edu.uis.reservas.config.ReglasNegocio;
 import co.edu.uis.reservas.domain.*;
 import co.edu.uis.reservas.dto.ReservaForm;
@@ -164,6 +165,9 @@ public class ReservaService {
 
     // REQ-16: inicio no anterior a ahora, fin posterior al inicio y duración dentro de los límites
     private void validarHorario(LocalDateTime inicio, LocalDateTime fin) {
+        if (!HorasReserva.esValida(inicio) || !HorasReserva.esValida(fin)) {
+            throw new ReglaNegocioException("Las horas solo pueden ser en punto o y media (por ejemplo 13:00, 13:30, 14:00).");
+        }
         if (inicio.isBefore(LocalDateTime.now())) {
             throw new ReglaNegocioException("La fecha y la hora de inicio no pueden ser anteriores al momento actual.");
         }

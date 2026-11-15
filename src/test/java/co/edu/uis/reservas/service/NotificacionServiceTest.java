@@ -16,6 +16,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +27,7 @@ class NotificacionServiceTest {
     private NotificacionRepository repo;
     private ObjectProvider<JavaMailSender> proveedor;
     private JavaMailSender sender;
+    private SmsService sms;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -34,10 +36,16 @@ class NotificacionServiceTest {
         when(repo.save(any(Notificacion.class))).thenAnswer(i -> i.getArgument(0));
         proveedor = mock(ObjectProvider.class);
         sender = mock(JavaMailSender.class);
+        sms = mock(SmsService.class);
+        // normalizar real simplificado: solo hay SMS si el teléfono tiene 10 dígitos
+        when(sms.normalizar(any())).thenAnswer(i -> {
+            String t = i.getArgument(0);
+            return (t != null && t.trim().matches("\\d{10}")) ? Optional.of("+57" + t.trim()) : Optional.empty();
+        });
     }
 
     private NotificacionService servicio(String modo) {
-        return new NotificacionService(repo, proveedor, modo, "no-reply@test.co");
+        return new NotificacionService(repo, sms, proveedor, modo, "no-reply@test.co");
     }
 
     private Usuario usuario(CanalNotificacion canal, String telefono) {
@@ -73,21 +81,56 @@ class NotificacionServiceTest {
         verify(repo).save(any(Notificacion.class));
     }
 
-    // REQ-36: SMS sin teléfono usa correo
+    // REQ-36: eligió SMS pero no tiene teléfono válido: se usa correo
     @Test
-    void smsSinTelefonoUsaCorreo() {
+    void sinTelefonoUsaCorreo() {
         Notificacion n = servicio("simulado")
                 .notificar(reserva(usuario(CanalNotificacion.SMS, "  ")), TipoNotificacion.RECORDATORIO, "Hola");
         assertEquals(CanalNotificacion.CORREO, n.getCanal());
+        verify(sms, never()).enviar(any(), any());
     }
 
-    // REQ-36: SMS con teléfono usa SMS
+    // Si eligió SMS y tiene teléfono válido, el aviso va por SMS con un mensaje corto
     @Test
-    void smsConTelefonoUsaSms() {
+    void conPreferenciaSmsEnviaMensajeCorto() {
         Notificacion n = servicio("simulado")
-                .notificar(reserva(usuario(CanalNotificacion.SMS, "3001234567")), TipoNotificacion.RECORDATORIO, "Hola");
+                .notificar(reserva(usuario(CanalNotificacion.SMS, "3001234567")), TipoNotificacion.CONFIRMACION,
+                        "Tu reserva fue confirmada.");
         assertEquals(CanalNotificacion.SMS, n.getCanal());
         assertTrue(n.isEnviada());
+        verify(sms).enviar("3001234567", "Reservas UIS: Tu reserva fue confirmada.");
+        verify(sender, never()).send(any(SimpleMailMessage.class));
+    }
+
+    // Si eligió correo, no se manda SMS aunque tenga teléfono
+    @Test
+    void conPreferenciaCorreoNoEnviaSms() {
+        Notificacion n = servicio("simulado")
+                .notificar(reserva(usuario(CanalNotificacion.CORREO, "3001234567")), TipoNotificacion.CONFIRMACION, "Hola");
+        assertEquals(CanalNotificacion.CORREO, n.getCanal());
+        verify(sms, never()).enviar(any(), any());
+    }
+
+    // Si desactivó las notificaciones no se envía ni se guarda nada
+    @Test
+    void conNotificacionesDesactivadasNoEnviaNada() {
+        Usuario u = usuario(CanalNotificacion.SMS, "3001234567");
+        u.setNotificacionesActivas(false);
+        Notificacion n = servicio("simulado").notificar(reserva(u), TipoNotificacion.CANCELACION, "Cancelada");
+        assertNull(n);
+        verify(sms, never()).enviar(any(), any());
+        verify(repo, never()).save(any(Notificacion.class));
+    }
+
+    // REQ-39: si el SMS falla, reintenta 3 veces, guarda enviada=false y NO lanza excepción
+    @Test
+    void smsConFalloReintentaTresVeces() {
+        doThrow(new IllegalStateException("sin conexión")).when(sms).enviar(any(), any());
+        Notificacion n = assertDoesNotThrow(() -> servicio("simulado")
+                .notificar(reserva(usuario(CanalNotificacion.SMS, "3001234567")), TipoNotificacion.CANCELACION, "Cancelada"));
+        assertFalse(n.isEnviada());
+        assertEquals(CanalNotificacion.SMS, n.getCanal());
+        verify(sms, times(3)).enviar(any(), any());
     }
 
     // REQ-39: modo real con envío correcto manda un solo correo

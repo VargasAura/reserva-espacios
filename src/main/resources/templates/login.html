@@ -10,6 +10,7 @@
   <div class="aviso error" th:if="${param.error}">Correo o contraseña incorrectos.</div>
   <div class="aviso ok" th:if="${param.registrado}">Cuenta creada. Ya puedes iniciar sesión.</div>
   <div class="aviso ok" th:if="${param.salio}">Cerraste sesión correctamente.</div>
+  <div class="aviso ok" th:if="${param.restablecida}">Contraseña actualizada. Ya puedes iniciar sesión.</div>
 
   <form th:action="@{/login}" method="post">
     <label for="username">Correo electrónico</label>
@@ -18,6 +19,7 @@
     <input id="password" name="password" type="password" required>
     <button class="btn ancho" type="submit">Entrar</button>
   </form>
+  <p style="text-align:center"><a th:href="@{/olvide-contrasena}">¿Olvidaste tu contraseña?</a></p>
   <p style="text-align:center;margin-bottom:0">¿No tienes cuenta? <a th:href="@{/registro}">Regístrate</a></p>
 </main>
 </body>

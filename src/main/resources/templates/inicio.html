@@ -15,7 +15,7 @@
 
   <!-- Saludo -->
   <div class="tarjeta">
-    <h1>Hola, <span sec:authentication="name">usuario</span> 👋</h1>
+    <h1>Hola, <span th:text="${nombre}">usuario</span> 👋</h1>
     <p>Bienvenido al Sistema de Reserva de Espacios Compartidos. ¿Qué quieres hacer hoy?</p>
   </div>
 
@@ -57,6 +57,6 @@
   </div>
 
 </main>
-<div class="pie">Sistema de Reserva de Espacios Compartidos · UIS</div>
+<div class="pie">Sistema de Reserva de Espacios Compartidos</div>
 </body>
 </html>

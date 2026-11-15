@@ -16,15 +16,15 @@ spring:
       path: /h2-console
   thymeleaf:
     cache: false
-    # Correo SMTP: solo se usa si app.notificaciones.modo = real. Nunca escribas la clave aquí: usa variables de entorno.
-    mail:
-      host: ${MAIL_HOST:smtp.gmail.com}
-      port: ${MAIL_PORT:587}
-      username: ${MAIL_USUARIO:}   # tu correo de envío
-      password: ${MAIL_CLAVE:}     # en Gmail: "contraseña de aplicación", no la normal
-      properties:
-        mail.smtp.auth: true
-        mail.smtp.starttls.enable: true
+  # Correo SMTP: solo se usa si app.notificaciones.modo = real. Nunca escribas la clave aquí: usa variables de entorno.
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USUARIO:reservadeespacios2@gmail.com}   # tu correo de envío
+    password: ${MAIL_CLAVE:xbki dhgj jzjk hgod}     # en Gmail: "contraseña de aplicación", no la normal
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
 
 server:
   port: 8080
@@ -34,8 +34,20 @@ server:
 
 
 app:
+  # Dirección pública de la aplicación: se usa en el enlace del correo de recuperación de contraseña
+  url-base: ${APP_URL:http://localhost:8080}
   notificaciones:
     # simulado = solo escribe en el log y lo da por enviado (por defecto) | real = envía correo por SMTP
-    modo: ${NOTIFICACIONES_MODO:simulado}
+    modo: ${NOTIFICACIONES_MODO:real}
     # Dirección "De:" del correo (si lo dejas vacío usa spring.mail.username)
-    remitente: ${spring.mail.username:no-reply@reservas.uis.edu.co}
+    remitente: ${MAIL_REMITENTE:${MAIL_USUARIO:reservadeespacios2@gmail.com}}
+  sms:
+    # simulado = solo escribe en el log y lo da por enviado (por defecto) | real = envía SMS reales con Twilio
+    modo: ${SMS_MODO:simulado}
+    # Código de país para teléfonos escritos sin él (Colombia = +57)
+    codigo-pais: ${SMS_CODIGO_PAIS:+57}
+    # Credenciales de Twilio: SOLO por variables de entorno, nunca escritas aquí
+    twilio:
+      account-sid: ${TWILIO_ACCOUNT_SID:}
+      auth-token: ${TWILIO_AUTH_TOKEN:}
+      desde: ${TWILIO_NUMERO:}   # número de Twilio que envía, con +, ej. +15551234567

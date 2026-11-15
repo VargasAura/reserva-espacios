@@ -24,6 +24,7 @@ public class ReservasScheduler {
     @Scheduled(fixedDelay = 60_000, initialDelay = 30_000)
     public void revisarReservas() {
         procesar("liberar reservas vencidas (REQ-18)", ciclo::idsReservadasVencidas, ciclo::liberarPorVencimiento);
+        procesar("recordar reservas sin ocupar", ciclo::idsSinOcuparParaRecordar, ciclo::enviarRecordatorioSinOcupar);
         procesar("marcar NoShow (REQ-25)", ciclo::idsConfirmadasSinUso, ciclo::marcarNoShow);
         procesar("finalizar reservas terminadas (REQ-24)", ciclo::idsEnUsoTerminadas, ciclo::finalizarAutomaticamente);
     }

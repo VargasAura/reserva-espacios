@@ -44,13 +44,23 @@
 
             <div class="fila-horas">
                 <div>
-                    <label for="horaInicio">Hora de inicio</label>
-                    <input id="horaInicio" type="time" th:field="*{horaInicio}">
+                    <label for="horaInicioHora">Hora de inicio</label>
+                    <div class="hora12">
+                        <input type="hidden" id="horaInicio" name="horaInicio"
+                               th:value="${reservaForm.horaInicio != null} ? ${#temporals.format(reservaForm.horaInicio, 'HH:mm')} : ''">
+                        <select class="h12-hora" id="horaInicioHora" aria-label="Hora de inicio"></select>
+                        <select class="h12-ap" aria-label="a. m. o p. m. de inicio"></select>
+                    </div>
                     <div class="error-campo" th:if="${#fields.hasErrors('horaInicio')}" th:errors="*{horaInicio}"></div>
                 </div>
                 <div>
-                    <label for="horaFin">Hora de fin</label>
-                    <input id="horaFin" type="time" th:field="*{horaFin}">
+                    <label for="horaFinHora">Hora de fin</label>
+                    <div class="hora12">
+                        <input type="hidden" id="horaFin" name="horaFin"
+                               th:value="${reservaForm.horaFin != null} ? ${#temporals.format(reservaForm.horaFin, 'HH:mm')} : ''">
+                        <select class="h12-hora" id="horaFinHora" aria-label="Hora de fin"></select>
+                        <select class="h12-ap" aria-label="a. m. o p. m. de fin"></select>
+                    </div>
                     <div class="error-campo" th:if="${#fields.hasErrors('horaFin')}" th:errors="*{horaFin}"></div>
                 </div>
             </div>
@@ -63,6 +73,7 @@
         </form>
     </div>
 </main>
-<div class="pie">Sistema de Reserva de Espacios Compartidos · UIS</div>
+<div class="pie">Sistema de Reserva de Espacios Compartidos</div>
+<script th:src="@{/js/hora12.js}"></script>
 </body>
 </html>

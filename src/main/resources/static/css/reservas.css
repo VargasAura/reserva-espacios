@@ -21,6 +21,8 @@
 /* Formulario de reserva */
 .form-reserva { max-width: 560px; margin: 0 auto; }
 .fila-horas { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.hora12 { display: flex; gap: .5rem; }
+.hora12 select { flex: 1; }
 .nota { color: var(--cafe-suave); font-size: .9rem; margin: .3rem 0 0; }
 .aviso.error.destacado { border-left: 6px solid var(--error); font-weight: 600; font-size: 1.02rem; }
 .botones-form { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.4rem; }

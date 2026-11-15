@@ -20,8 +20,20 @@ public final class ReglasNegocio {
     /** REQ-20: anticipación mínima para cancelar una reserva CONFIRMADA. */
     public static final Duration ANTICIPACION_CANCELACION = Duration.ofHours(2);
 
-    /** REQ-25: tolerancia después de la hora de inicio antes de marcar NO_SHOW. */
-    public static final Duration TOLERANCIA_NO_SHOW = Duration.ofMinutes(15);
+    /** Las horas de inicio y fin solo pueden caer en punto o y media (1:00, 1:30, 2:00, 2:30...). */
+    public static final int INTERVALO_HORARIO_MINUTOS = 30;
+
+    /**
+     * Recordatorio por mensaje de texto: si pasado este tiempo desde la hora de inicio el espacio todavía
+     * no se marcó como ocupado (EN_USO), se le recuerda a la persona su reserva.
+     */
+    public static final Duration RECORDATORIO_SIN_OCUPAR = Duration.ofMinutes(15);
+
+    /**
+     * REQ-25: tolerancia después de la hora de inicio antes de marcar NO_SHOW.
+     * Debe ser MAYOR que RECORDATORIO_SIN_OCUPAR, para que el recordatorio llegue antes de la inasistencia.
+     */
+    public static final Duration TOLERANCIA_NO_SHOW = Duration.ofMinutes(30);
 
     /** REQ-34: anticipación del recordatorio. */
     public static final Duration ANTICIPACION_RECORDATORIO = Duration.ofHours(24);

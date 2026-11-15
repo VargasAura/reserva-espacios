@@ -284,11 +284,11 @@
         return nodo;
     }
 
-    // REQ-15: enlace a la pantalla de reservas con los datos precargados (la hora 24:00 se envía como 23:59)
+    // REQ-15: enlace a la pantalla de reservas con los datos precargados (la hora 24:00 se envía como 00:00 = medianoche)
     function urlReserva(espacioId, dia, inicio, fin) {
         var p = new URLSearchParams({
             espacioId: espacioId, fecha: dia,
-            horaInicio: hhmm(inicio), horaFin: hhmm(Math.min(fin, 1439))
+            horaInicio: hhmm(inicio), horaFin: hhmm(fin % 1440)
         });
         return URL_RESERVA + '?' + p.toString();
     }

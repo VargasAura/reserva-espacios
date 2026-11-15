@@ -52,6 +52,19 @@
             </div>
         </div>
 
+        <!-- Cómo recibir los avisos de las reservas -->
+        <div class="tarjeta acento" style="margin-top:1.5rem">
+            <h2>Notificaciones</h2>
+            <p class="nota">Avisos de tus reservas: confirmación, cambios, cancelación y recordatorios.</p>
+            <label class="check"><input type="radio" th:field="*{notificaciones}" value="SMS">
+                <span>Mensaje de texto (SMS) al teléfono registrado</span></label>
+            <label class="check"><input type="radio" th:field="*{notificaciones}" value="CORREO">
+                <span>Correo electrónico</span></label>
+            <label class="check"><input type="radio" th:field="*{notificaciones}" value="NINGUNA">
+                <span>No quiero recibir notificaciones</span></label>
+            <div class="error-campo" th:if="${#fields.hasErrors('notificaciones')}" th:errors="*{notificaciones}"></div>
+        </div>
+
         <div class="perfil-guardar">
             <button class="btn" type="submit">Guardar cambios</button>
         </div>
@@ -81,6 +94,6 @@
     </div>
 
 </main>
-<div class="pie">Sistema de Reserva de Espacios Compartidos · UIS</div>
+<div class="pie">Sistema de Reserva de Espacios Compartidos</div>
 </body>
 </html>

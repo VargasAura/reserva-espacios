@@ -148,6 +148,32 @@ public class CicloReservaService {
                 "Recordatorio: tienes una reserva en " + descripcion(r) + ".");
     }
 
+    // Recordatorio por SMS: reservas CONFIRMADAS que empezaron hace más de RECORDATORIO_SIN_OCUPAR y todavía no pasan
+    // a EN_USO (el espacio no se ha marcado como ocupado). Se mira solo hasta que le toque NO_SHOW.
+    @Transactional(readOnly = true)
+    public List<Long> idsSinOcuparParaRecordar() {
+        LocalDateTime ahora = LocalDateTime.now();
+        return ids(consultas.findByEstadoAndInicioBetween(EstadoReserva.CONFIRMADA,
+                ahora.minus(ReglasNegocio.TOLERANCIA_NO_SHOW), ahora.minus(ReglasNegocio.RECORDATORIO_SIN_OCUPAR)));
+    }
+
+    // Envía ese recordatorio una sola vez por reserva (se distingue del de 24 h porque se envía después del inicio)
+    @Transactional
+    public void enviarRecordatorioSinOcupar(Long id) {
+        Reserva r = obtener(id);
+        LocalDateTime ahora = LocalDateTime.now();
+        if (r.getEstado() != EstadoReserva.CONFIRMADA) return;
+        if (r.getInicio().plus(ReglasNegocio.RECORDATORIO_SIN_OCUPAR).isAfter(ahora)) return; // todavía no es la hora
+        LocalDateTime limiteNoShow = r.getInicio().plus(ReglasNegocio.TOLERANCIA_NO_SHOW);
+        if (!limiteNoShow.isAfter(ahora)) return; // ya le toca NO_SHOW: el recordatorio no tiene sentido
+        boolean yaAvisada = notificacionRepository.findByReservaIdOrderByFechaEnvioDesc(id).stream()
+                .anyMatch(n -> n.getTipo() == TipoNotificacion.RECORDATORIO && n.getFechaEnvio().isAfter(r.getInicio()));
+        if (yaAvisada) return;
+        notificacionService.notificar(r, TipoNotificacion.RECORDATORIO,
+                "Tu reserva en " + descripcion(r) + " ya empezó y el espacio aún no está marcado como ocupado. "
+                        + "Si no llegas, se registrará como inasistencia a las " + HORA.format(limiteNoShow) + ".");
+    }
+
     // REQ-27: guarda un cambio de estado. Público para que ReservaService (Chat 3) lo use al crear, confirmar y cancelar
     @Transactional
     public void registrarCambio(Reserva reserva, EstadoReserva anterior, EstadoReserva nuevo, String responsable) {

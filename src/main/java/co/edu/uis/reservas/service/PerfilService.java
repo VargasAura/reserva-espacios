@@ -1,5 +1,6 @@
 package co.edu.uis.reservas.service;
 
+import co.edu.uis.reservas.domain.CanalNotificacion;
 import co.edu.uis.reservas.domain.Reserva;
 import co.edu.uis.reservas.domain.Usuario;
 import co.edu.uis.reservas.dto.PerfilForm;
@@ -19,7 +20,8 @@ public class PerfilService {
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
 
-    public record DatosPerfil(String nombre, String email, String telefono) {}
+    /** notificaciones = SMS, CORREO o NINGUNA (lo que se marca en el perfil). */
+    public record DatosPerfil(String nombre, String email, String telefono, String notificaciones) {}
 
     /** Una fila del historial; estado = nombre del enum (para el color), estadoTexto = texto legible. */
     public record FilaHistorial(String espacio, String fecha, String horario, String estado, String estadoTexto) {}
@@ -27,9 +29,11 @@ public class PerfilService {
     private final UsuarioRepository usuarioRepository;
     private final ReservaRepository reservaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SmsService smsService;
 
     public PerfilService(UsuarioRepository usuarioRepository, ReservaRepository reservaRepository,
-                         PasswordEncoder passwordEncoder) {
+                         PasswordEncoder passwordEncoder, SmsService smsService) {
+        this.smsService = smsService;
         this.usuarioRepository = usuarioRepository;
         this.reservaRepository = reservaRepository;
         this.passwordEncoder = passwordEncoder;
@@ -39,7 +43,8 @@ public class PerfilService {
     @Transactional(readOnly = true)
     public DatosPerfil datos(String email) {
         Usuario u = buscar(email);
-        return new DatosPerfil(u.getNombre(), u.getEmail(), u.getTelefono());
+        String notificaciones = u.isNotificacionesActivas() ? u.getCanalNotificacion().name() : "NINGUNA";
+        return new DatosPerfil(u.getNombre(), u.getEmail(), u.getTelefono(), notificaciones);
     }
 
     // REQ-8: historial de reservas con espacio, fecha, horario y estado (más recientes primero)
@@ -73,9 +78,28 @@ public class PerfilService {
             u.setPassword(passwordEncoder.encode(form.getPasswordNueva()));
         }
 
+        aplicarNotificaciones(u, form);
         u.setNombre(form.getNombre().trim());
         u.setTelefono(form.getTelefono().trim());
         usuarioRepository.save(u);
+    }
+
+    // Preferencia de avisos: NINGUNA los desactiva (y recuerda el canal anterior); SMS exige un teléfono válido
+    private void aplicarNotificaciones(Usuario u, PerfilForm form) {
+        switch (form.getNotificaciones()) {
+            case "NINGUNA" -> u.setNotificacionesActivas(false);
+            case "CORREO" -> {
+                u.setNotificacionesActivas(true);
+                u.setCanalNotificacion(CanalNotificacion.CORREO);
+            }
+            default -> {
+                if (smsService.normalizar(form.getTelefono()).isEmpty()) {
+                    throw new ReglaNegocioException("Para recibir mensajes de texto necesitas un teléfono válido.");
+                }
+                u.setNotificacionesActivas(true);
+                u.setCanalNotificacion(CanalNotificacion.SMS);
+            }
+        }
     }
 
     // REQ-8: convierte una reserva en una fila de texto lista para mostrar

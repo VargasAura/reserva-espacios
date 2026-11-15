@@ -34,6 +34,7 @@ public class PerfilController {
         PerfilForm form = new PerfilForm();
         form.setNombre(datos.nombre());
         form.setTelefono(datos.telefono());
+        form.setNotificaciones(datos.notificaciones());
         model.addAttribute("perfilForm", form);
         cargarDatos(model, principal.getName());
         return VISTA;
