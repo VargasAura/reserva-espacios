@@ -42,7 +42,7 @@ Hay dos tipos de personas (roles): **usuario** y **administrador**.
 
 ### Administrador
 Todo lo anterior, más:
-- **Espacios**: crear, editar y eliminar espacios (nombre, tipo, capacidad, ubicación, tarifa por hora).
+- **Espacios**: crear, editar y eliminar espacios (nombre, tipo, capacidad, ubicación).
   Eliminar es “lógico”: el espacio desaparece de las listas pero su historial se conserva, y solo se permite si no tiene reservas futuras activas.
 - **Uso de reservas**: marcar cuándo una reserva *empieza a usarse* (el espacio pasa a ocupado) y cuándo *termina*.
   Se abre desde la tarjeta correspondiente en la pantalla de inicio.
